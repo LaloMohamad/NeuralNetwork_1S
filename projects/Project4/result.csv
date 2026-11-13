@@ -1,0 +1,2 @@
+dataset,weights_file,test_file,correct,total,performance_percent,learning_rate,hidden_nodes,epochs
+mnist,../Project3/weights/mnist_train-20261112-195159-093.nnw,mnist_test.txt,9217,10000,92.17,0.21,32,1

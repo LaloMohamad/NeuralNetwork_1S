@@ -1,0 +1,7 @@
+bin/
+obj/
+.DS_Store
+*.zip
+projects/Project3/weights/mnist_train-*.nnw
+!projects/Project3/weights/mnist_train-20261112-195159-093.nnw
+projects/Project3/weights/network-*.nnw

@@ -1,0 +1,112 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="using:NeuralNetworks_1"
+        mc:Ignorable="d" d:DesignWidth="1450" d:DesignHeight="800"
+        x:Class="NeuralNetworks_1.MainWindow"
+        Title="Neural Network - Labs 3 und 4" Height="800" Width="1450"
+        MinWidth="1100" MinHeight="650">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="12" RowSpacing="10">
+        <TextBlock Grid.Row="0" Text="Neural Network - MNIST / Fashion-MNIST"
+                   FontSize="20" FontWeight="SemiBold"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12">
+            <StackPanel Width="105" Spacing="4">
+                <TextBlock Text="Input Nodes"/>
+                <TextBox x:Name="inputTextBox" Text="784"/>
+            </StackPanel>
+            <StackPanel Width="105" Spacing="4">
+                <TextBlock Text="Hidden Nodes"/>
+                <TextBox x:Name="hiddenTextBox" Text="32"/>
+            </StackPanel>
+            <StackPanel Width="105" Spacing="4">
+                <TextBlock Text="Output Nodes"/>
+                <TextBox x:Name="outputTextBox" Text="10"/>
+            </StackPanel>
+            <StackPanel Width="105" Spacing="4">
+                <TextBlock Text="Learning Rate"/>
+                <TextBox x:Name="learningRateTextBox" Text="0.21"/>
+            </StackPanel>
+            <StackPanel Width="105" Spacing="4">
+                <TextBlock Text="Epochen"/>
+                <TextBox x:Name="epochsTextBox" Text="1"/>
+            </StackPanel>
+            <StackPanel Width="100" Spacing="4">
+                <TextBlock Text="Netz"/>
+                <Button x:Name="createButton" Content="Neues Netz" Click="createButton_Click"/>
+            </StackPanel>
+            <CheckBox x:Name="showImagesCheckBox" Content="Bilder einzeln zeigen"
+                      VerticalAlignment="Bottom" Margin="10,0,0,7"/>
+            <TextBlock Text="Im Dialog: Weiter oder Rest ohne Anzeige."
+                       VerticalAlignment="Bottom" Margin="0,0,0,9" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <Grid Grid.Row="2" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto"
+              RowSpacing="7" ColumnSpacing="7">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Trainingsdatei" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="trainingFileTextBox"/>
+            <Button Grid.Row="0" Grid.Column="2" Content="Datei wählen" Click="browseTrainingButton_Click"/>
+            <Button Grid.Row="0" Grid.Column="3" x:Name="trainButton" Content="Trainieren" Click="trainButton_Click"/>
+            <Button Grid.Row="0" Grid.Column="4" x:Name="saveButton" Content="Gewichte speichern" Click="saveButton_Click"/>
+            <Button Grid.Row="0" Grid.Column="5" x:Name="loadButton" Content="Gewichte laden" Click="loadButton_Click"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Testdatei" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="1" Grid.Column="1" x:Name="queryFileTextBox"/>
+            <Button Grid.Row="1" Grid.Column="2" Content="Datei wählen" Click="browseQueryButton_Click"/>
+            <Button Grid.Row="1" Grid.Column="3" x:Name="queryButton" Content="Testen" Click="queryButton_Click"/>
+            <Button Grid.Row="1" Grid.Column="4" x:Name="cancelButton" Content="Abbrechen" Click="cancelButton_Click"
+                    IsEnabled="False"/>
+            <TextBlock Grid.Row="1" Grid.Column="5" Text="TXT: Label, 784 Pixel"
+                       VerticalAlignment="Center"/>
+        </Grid>
+
+        <Grid Grid.Row="3" ColumnDefinitions="*,320" ColumnSpacing="12">
+            <StackPanel Grid.Column="0" Spacing="5">
+                <TextBlock Text="Tabelle: alle Knotenwerte; Gewichtsspalten als Vorschau."/>
+                <DataGrid x:Name="networkDataGrid" x:DataType="local:nodeRow"
+                          AutoGenerateColumns="False" IsReadOnly="True"
+                          CanUserSortColumns="False" GridLinesVisibility="All"
+                          BorderThickness="1" Height="490">
+                    <DataGrid.Resources>
+                        <x:Double x:Key="DataGridSortIconMinWidth">0</x:Double>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Input" Width="80" Binding="{Binding inputValue}"/>
+                        <DataGridTextColumn Header="Weights I-H" Width="130" Binding="{Binding weightsIH}"/>
+                        <DataGridTextColumn Header="Input Hidden" Width="95" Binding="{Binding inputHidden}"/>
+                        <DataGridTextColumn Header="Output Hidden" Width="100" Binding="{Binding outputHidden}"/>
+                        <DataGridTextColumn Header="Weights H-O" Width="130" Binding="{Binding weightsHO}"/>
+                        <DataGridTextColumn Header="Error Hidden" Width="100" Binding="{Binding errorHidden}"/>
+                        <DataGridTextColumn Header="Input Output" Width="95" Binding="{Binding inputOutput}"/>
+                        <DataGridTextColumn Header="Output Layer" Width="95" Binding="{Binding outputLayer}"/>
+                        <DataGridTextColumn Header="Target" Width="65" Binding="{Binding target}"/>
+                        <DataGridTextColumn Header="Error Output" Width="100" Binding="{Binding errorOutput}"/>
+                        <DataGridTextColumn Header="Learn Rate" Width="90" Binding="{Binding learningRate}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Spacing="6">
+                <Border BorderBrush="Gray" BorderThickness="1" Width="250" Height="250">
+                    <Image x:Name="digitImage" Stretch="Fill"/>
+                </Border>
+                <TextBlock x:Name="labelTextBlock" Text="Richtiges Label: -"/>
+                <TextBlock x:Name="recognizedTextBlock" Text="Erkannt: -"
+                           FontSize="18" FontWeight="SemiBold"/>
+                <TextBlock Text="Trainingstreffer (auf Trainingsbildern)"/>
+                <TextBox x:Name="trainingAccuracyTextBox" Text="-" IsReadOnly="True"/>
+                <TextBlock Text="Test-Performance (richtige / alle)"/>
+                <TextBox x:Name="performanceTextBox" Text="-" IsReadOnly="True"/>
+                <TextBlock Text="Mittlerer Fehler der letzten Epoche"/>
+                <TextBox x:Name="lossTextBox" Text="-" IsReadOnly="True"/>
+                <TextBlock Text="Letzte Gewichtsdatei"/>
+                <TextBox x:Name="weightsPathTextBox" Text="-" IsReadOnly="True"
+                         TextWrapping="Wrap" Height="48"/>
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Grid.Row="4" x:Name="statusTextBlock" Text="Create klicken, dann Trainingsdatei auswählen."
+                   TextWrapping="Wrap"/>
+    </Grid>
+</Window>

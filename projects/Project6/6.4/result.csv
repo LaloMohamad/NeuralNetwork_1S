@@ -1,0 +1,2 @@
+weights_file,correct,total,performance_percent
+../6.3/weights/fashion_60k_lr0_21_h32_e1.nnw,7512,10000,75.1200
